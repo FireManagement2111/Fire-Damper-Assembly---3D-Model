@@ -1,0 +1,1856 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fire Damper 3D Model</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background: #f0f0f0;
+        }
+        #header {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            height: 80px;
+        }
+        #header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+        #header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        #mainContent {
+            display: flex;
+            width: 100%;
+            height: calc(100vh - 260px);
+            margin-top: 80px;
+        }
+        #container {
+            flex: 1;
+            background: #e8e8e8;
+            cursor: grab;
+        }
+        #container:active {
+            cursor: grabbing;
+        }
+        #sidePanel {
+            width: 400px;
+            background: white;
+            border-left: 3px solid #2c3e50;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        .panel-header {
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .category {
+            border-bottom: 2px solid #ddd;
+        }
+        .category-title {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .category-title:hover {
+            background: #34495e;
+        }
+        .category-title .icon {
+            font-size: 20px;
+            transition: transform 0.3s;
+        }
+        .category-title.open .icon {
+            transform: rotate(180deg);
+        }
+        .category-content {
+            display: none;
+            background: #f8f9fa;
+        }
+        .category-content.show {
+            display: block;
+        }
+        .damper-type {
+            border-bottom: 1px solid #ccc;
+        }
+        .damper-type:last-child {
+            border-bottom: none;
+        }
+        .damper-type-title {
+            background: #34495e;
+            color: white;
+            padding: 13px 20px 13px 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .damper-type-title:hover {
+            background: #415b76;
+        }
+        .damper-type-title .icon {
+            font-size: 18px;
+            transition: transform 0.3s;
+        }
+        .damper-type-title.open .icon {
+            transform: rotate(180deg);
+        }
+        .damper-type-content {
+            display: none;
+            background: #e8eef2;
+        }
+        .damper-type-content.show {
+            display: block;
+        }
+        .subitem {
+            border-bottom: 1px solid #ddd;
+        }
+        .subitem:last-child {
+            border-bottom: none;
+        }
+        .subitem-title {
+            background: #bdc3c7;
+            padding: 12px 20px 12px 40px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .subitem-title:hover {
+            background: #95a5a6;
+        }
+        .subitem-title .icon {
+            font-size: 16px;
+            transition: transform 0.3s;
+        }
+        .subitem-title.open .icon {
+            transform: rotate(180deg);
+        }
+        .subitem-content {
+            display: none;
+            background: #e8e8e8;
+        }
+        .subitem-content.show {
+            display: block;
+        }
+        .type-item {
+            border-bottom: 1px solid #ccc;
+        }
+        .type-item:last-child {
+            border-bottom: none;
+        }
+        .type-title {
+            background: #ecf0f1;
+            padding: 10px 20px 10px 60px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+        }
+        .type-title:hover {
+            background: #d5dbdb;
+        }
+        .type-title .icon {
+            font-size: 14px;
+            transition: transform 0.3s;
+        }
+        .type-title.open .icon {
+            transform: rotate(180deg);
+        }
+        .type-content {
+            display: none;
+            background: white;
+            padding: 15px 25px 15px 70px;
+        }
+        .type-content.show {
+            display: block;
+        }
+        .type-content img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            margin: 10px 0;
+            cursor: pointer;
+            transition: opacity 0.3s;
+        }
+        .type-content img:hover {
+            opacity: 0.8;
+        }
+        #imageModal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+        }
+        #imageModal.show {
+            display: flex;
+        }
+        #imageModal img {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        #closeModal {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background-color: #e74c3c;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 30px;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background-color 0.3s;
+        }
+        #closeModal:hover {
+            background-color: #c0392b;
+        }
+        .image-box {
+            width: 100%;
+            min-height: 180px;
+            background: #f5f5f5;
+            border: 2px dashed #ccc;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #999;
+            font-style: italic;
+            margin: 10px 0;
+            font-size: 13px;
+        }
+        .type-content p {
+            font-size: 12px;
+            color: #666;
+            margin-top: 10px;
+        }
+        #footer {
+            background: #ecf0f1;
+            padding: 15px 20px;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            font-size: 13px;
+            height: 180px;
+            overflow-y: auto;
+            border-top: 2px solid #bdc3c7;
+        }
+        #footer h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        #footer ul {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 8px;
+            list-style: none;
+        }
+        #footer li {
+            padding: 3px 0;
+        }
+        #footer li .clickable-number {
+            cursor: pointer;
+            color: #2c3e50;
+            font-weight: bold;
+            text-decoration: underline;
+            transition: color 0.3s;
+        }
+        #footer li .clickable-number:hover {
+            color: #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div id="header">
+        <h1>Fire Damper Assembly - 3D Model</h1>
+        <p>Drag to rotate • Scroll to zoom • Right-click drag to pan</p>
+    </div>
+    
+    <div id="mainContent">
+        <div id="container"></div>
+        <div id="sidePanel">
+            <div class="panel-header">Fire Damper Installation Types</div>
+            
+            <div class="category">
+                <div class="category-title" onclick="toggleCategory(this)">
+                    <span>Wall</span>
+                    <span class="icon">▼</span>
+                </div>
+                <div class="category-content">
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Intumescent Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Masonry / Concrete</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Masonry/Concrete - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Masonry/Concrete - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Masonry/Concrete - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Plasterboard</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Plasterboard - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Plasterboard - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Plasterboard - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Fire Rated Board</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Fire Rated Board - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Fire Rated Board - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Intumescent Damper - Fire Rated Board - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Mechanical Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Masonry / Concrete</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Masonry/Concrete - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Masonry/Concrete - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Masonry/Concrete - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Plasterboard</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Plasterboard - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Plasterboard - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Plasterboard - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Fire Rated Board</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Fire Rated Board - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Fire Rated Board - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Wall - Mechanical Damper - Fire Rated Board - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-title" onclick="toggleCategory(this)">
+                    <span>Shaftwall</span>
+                    <span class="icon">▼</span>
+                </div>
+                <div class="category-content">
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Intumescent Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Masonry / Concrete</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Masonry/Concrete - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Masonry/Concrete - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Masonry/Concrete - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Plasterboard</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Plasterboard - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Plasterboard - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Plasterboard - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Fire Rated Board</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Fire Rated Board - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Fire Rated Board - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Intumescent Damper - Fire Rated Board - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Mechanical Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Masonry / Concrete</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Masonry/Concrete - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Masonry/Concrete - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Masonry/Concrete - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Plasterboard</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Plasterboard - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Plasterboard - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Plasterboard - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Fire Rated Board</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Fire Rated Board - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Fire Rated Board - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Shaftwall - Mechanical Damper - Fire Rated Board - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-title" onclick="toggleCategory(this)">
+                    <span>Floorslab</span>
+                    <span class="icon">▼</span>
+                </div>
+                <div class="category-content">
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Intumescent Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Masonry / Concrete</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Masonry/Concrete - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Masonry/Concrete - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Masonry/Concrete - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Plasterboard</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Plasterboard - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Plasterboard - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Plasterboard - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Fire Rated Board</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Fire Rated Board - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Fire Rated Board - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Intumescent Damper - Fire Rated Board - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Mechanical Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Masonry / Concrete</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Masonry/Concrete - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Masonry/Concrete - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Masonry/Concrete - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Plasterboard</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Plasterboard - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Plasterboard - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Plasterboard - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Fire Rated Board</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Fire Rated Board - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Fire Rated Board - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Floorslab - Mechanical Damper - Fire Rated Board - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-title" onclick="toggleCategory(this)">
+                    <span>Ceiling</span>
+                    <span class="icon">▼</span>
+                </div>
+                <div class="category-content">
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Intumescent Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Masonry / Concrete</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Masonry/Concrete - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Masonry/Concrete - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Masonry/Concrete - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Plasterboard</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Plasterboard - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Plasterboard - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Plasterboard - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Fire Rated Board</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Fire Rated Board - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Fire Rated Board - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Intumescent Damper - Fire Rated Board - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Mechanical Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Masonry / Concrete</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Masonry/Concrete - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Masonry/Concrete - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Masonry/Concrete - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Plasterboard</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Plasterboard - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Plasterboard - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Plasterboard - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>Substrate: Fire Rated Board</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Fire Rated Board - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Fire Rated Board - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Ceiling - Mechanical Damper - Fire Rated Board - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="category">
+                <div class="category-title" onclick="toggleCategory(this)">
+                    <span>Fire Doors</span>
+                    <span class="icon">▼</span>
+                </div>
+                <div class="category-content">
+                    <div class="damper-type">
+                        <div class="damper-type-title" onclick="toggleDamperType(this)">
+                            <span>Intumescent Damper</span>
+                            <span class="icon">▼</span>
+                        </div>
+                        <div class="damper-type-content">
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>FireCore</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <img src="https://i.imgur.com/SetTMtt.jpg" alt="FireCore Type 1 Installation" onclick="openImageModal(this.src, this.alt)">
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - FireCore - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - FireCore - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - FireCore - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>ECore</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - ECore - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - ECore - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - ECore - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="subitem">
+                                <div class="subitem-title" onclick="toggleSubitem(this)">
+                                    <span>PyroPanel</span>
+                                    <span class="icon">▼</span>
+                                </div>
+                                <div class="subitem-content">
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 1</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - PyroPanel - Type 1</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 2</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - PyroPanel - Type 2</p>
+                                        </div>
+                                    </div>
+                                    <div class="type-item">
+                                        <div class="type-title" onclick="toggleType(this)">
+                                            <span>Type 3</span>
+                                            <span class="icon">▼</span>
+                                        </div>
+                                        <div class="type-content">
+                                            <div class="image-box">Image placeholder - Add your image here</div>
+                                            <p>Technical specifications for Fire Doors - Intumescent Damper - PyroPanel - Type 3</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="footer">
+        <h3>Component Key:</h3>
+        <ul>
+            <li><strong>1.</strong> Duct (Left)</li>
+            <li><strong>2.</strong> Duct (Right)</li>
+            <li><strong>3.</strong> Fire Damper Housing</li>
+            <li><strong>4.</strong> Intumescent Fire Damper Blades</li>
+            <li><strong>5.</strong> Wall Penetration</li>
+            <li><strong>6.</strong> Angle Flange Connection</li>
+            <li><strong>7.</strong> Sealant</li>
+            <li><strong>8.</strong> Aluminium Sleeve Connection</li>
+            <li><strong>9.</strong> Aluminium Rivets</li>
+            <li><strong>10.</strong> Nylon Bolts (Ø8 mm max)</li>
+            <li><strong>11.</strong> Access Panel</li>
+        </ul>
+    </div>
+
+    <div id="imageModal">
+        <button id="closeModal">×</button>
+        <img id="modalImage" src="" alt="Expanded view">
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script>
+        // Define image modal functions FIRST - before anything else
+        function openImageModal(src, alt) {
+            const imageModal = document.getElementById('imageModal');
+            const modalImage = document.getElementById('modalImage');
+            modalImage.src = src;
+            modalImage.alt = alt;
+            imageModal.classList.add('show');
+        }
+
+        function showComponentImage(componentNumber) {
+            const placeholderSrc = 'data:image/svg+xml,' + encodeURIComponent(
+                '<svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">' +
+                '<rect width="800" height="600" fill="#f5f5f5"/>' +
+                '<rect x="50" y="50" width="700" height="500" fill="white" stroke="#ddd" stroke-width="2"/>' +
+                '<text x="400" y="280" font-family="Arial" font-size="28" font-weight="bold" fill="#2c3e50" text-anchor="middle">' +
+                'Component ' + componentNumber + ': Angle Flange Connection' +
+                '</text>' +
+                '<text x="400" y="340" font-family="Arial" font-size="18" fill="#999" text-anchor="middle">' +
+                'Image placeholder - Add your image here' +
+                '</text>' +
+                '</svg>'
+            );
+            openImageModal(placeholderSrc, 'Component ' + componentNumber + ' - Angle Flange Connection');
+        }
+
+        // THREE.js scene setup
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0xf0f0f0);
+        
+        const container = document.getElementById('container');
+        const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 1000);
+        camera.position.set(8, 6, 10);
+        camera.lookAt(0, 0, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(container.clientWidth, container.clientHeight);
+        renderer.shadowMap.enabled = true;
+        container.appendChild(renderer.domElement);
+
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        directionalLight.position.set(5, 10, 5);
+        directionalLight.castShadow = true;
+        scene.add(directionalLight);
+
+        const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
+        directionalLight2.position.set(-5, 5, -5);
+        scene.add(directionalLight2);
+
+        const ductMaterial = new THREE.MeshStandardMaterial({ color: 0xc0c0c0, metalness: 0.6, roughness: 0.4 });
+        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xe0e0e0, roughness: 0.8 });
+        const damperMaterial = new THREE.MeshStandardMaterial({ color: 0x909090, metalness: 0.5, roughness: 0.5 });
+        const sealantMaterial = new THREE.MeshStandardMaterial({ color: 0x404040, roughness: 0.9 });
+
+        const leftDuct = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 2), ductMaterial);
+        leftDuct.position.set(-3, 0, 0);
+        scene.add(leftDuct);
+
+        const rightDuct = new THREE.Mesh(new THREE.BoxGeometry(3, 2, 2), ductMaterial);
+        rightDuct.position.set(3, 0, 0);
+        scene.add(rightDuct);
+
+        const wall = new THREE.Mesh(new THREE.BoxGeometry(0.3, 4, 3), wallMaterial);
+        wall.position.set(0, 0, 0);
+        scene.add(wall);
+
+        const housing = new THREE.Mesh(new THREE.BoxGeometry(0.8, 2.2, 2.2), damperMaterial);
+        housing.position.set(0, 0, 0);
+        scene.add(housing);
+
+        const bladeCount = 7;
+        const bladeSpacing = 2 / (bladeCount + 1);
+        for (let i = 0; i < bladeCount; i++) {
+            const blade = new THREE.Mesh(
+                new THREE.BoxGeometry(0.6, 0.08, 1.8), 
+                new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.7, opacity: 0.9, transparent: true })
+            );
+            blade.position.set(0, -1 + bladeSpacing * (i + 1), 0);
+            scene.add(blade);
+        }
+
+        const flangeGeometry = new THREE.BoxGeometry(0.15, 0.15, 2);
+        const flangeMaterial = new THREE.MeshStandardMaterial({ color: 0x8b4513, metalness: 0.7, roughness: 0.3 });
+        
+        const topFlange = new THREE.Mesh(flangeGeometry, flangeMaterial);
+        topFlange.position.set(-1.5, 1.1, 0);
+        scene.add(topFlange);
+
+        const bottomFlange = new THREE.Mesh(flangeGeometry, flangeMaterial);
+        bottomFlange.position.set(-1.5, -1.1, 0);
+        scene.add(bottomFlange);
+
+        const sealantGeometry = new THREE.CylinderGeometry(0.1, 0.1, 2, 16);
+        const topSealant = new THREE.Mesh(sealantGeometry, sealantMaterial);
+        topSealant.rotation.x = Math.PI / 2;
+        topSealant.position.set(0.2, 1.15, 0);
+        scene.add(topSealant);
+
+        const bottomSealant = new THREE.Mesh(sealantGeometry, sealantMaterial);
+        bottomSealant.rotation.x = Math.PI / 2;
+        bottomSealant.position.set(0.2, -1.15, 0);
+        scene.add(bottomSealant);
+
+        const sleeveGeometry = new THREE.BoxGeometry(0.5, 0.1, 2.1);
+        const sleeveMaterial = new THREE.MeshStandardMaterial({ color: 0xb0b0b0, metalness: 0.8, roughness: 0.3 });
+        
+        const topSleeve = new THREE.Mesh(sleeveGeometry, sleeveMaterial);
+        topSleeve.position.set(2.5, 1, 0);
+        scene.add(topSleeve);
+
+        const bottomSleeve = new THREE.Mesh(sleeveGeometry, sleeveMaterial);
+        bottomSleeve.position.set(2.5, -1, 0);
+        scene.add(bottomSleeve);
+
+        const rivetGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.15, 8);
+        const rivetMaterial = new THREE.MeshStandardMaterial({ color: 0xa0a0a0, metalness: 0.9, roughness: 0.2 });
+        const rivetPositions = [
+            [2.5, 1, -0.8], [2.5, 1, -0.4], [2.5, 1, 0], [2.5, 1, 0.4], [2.5, 1, 0.8],
+            [2.5, -1, -0.8], [2.5, -1, -0.4], [2.5, -1, 0], [2.5, -1, 0.4], [2.5, -1, 0.8]
+        ];
+        
+        rivetPositions.forEach(pos => {
+            const rivet = new THREE.Mesh(rivetGeometry, rivetMaterial);
+            rivet.position.set(pos[0], pos[1], pos[2]);
+            rivet.rotation.z = Math.PI / 2;
+            scene.add(rivet);
+        });
+
+        const accessPanel = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.4, 0.4, 0.05, 32), 
+            new THREE.MeshStandardMaterial({ color: 0xa0a0a0, metalness: 0.3, roughness: 0.6 })
+        );
+        accessPanel.rotation.z = Math.PI / 2;
+        accessPanel.position.set(3.5, -0.8, 0);
+        scene.add(accessPanel);
+
+        const boltGeometry = new THREE.CylinderGeometry(0.04, 0.04, 0.2, 8);
+        const boltMaterial = new THREE.MeshStandardMaterial({ color: 0x303030, metalness: 0.6, roughness: 0.4 });
+        const boltPositions = [
+            [-1.5, 1.1, -0.8], [-1.5, 1.1, -0.4], [-1.5, 1.1, 0.4], [-1.5, 1.1, 0.8],
+            [-1.5, -1.1, -0.8], [-1.5, -1.1, -0.4], [-1.5, -1.1, 0.4], [-1.5, -1.1, 0.8]
+        ];
+        
+        boltPositions.forEach(pos => {
+            const bolt = new THREE.Mesh(boltGeometry, boltMaterial);
+            bolt.position.set(pos[0], pos[1], pos[2]);
+            bolt.rotation.x = Math.PI / 2;
+            scene.add(bolt);
+        });
+
+        function createNumberMarker(number, position) {
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = 128;
+            canvas.height = 128;
+            
+            context.fillStyle = 'rgba(255, 200, 0, 0.95)';
+            context.beginPath();
+            context.arc(64, 64, 50, 0, Math.PI * 2);
+            context.fill();
+            
+            context.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+            context.lineWidth = 4;
+            context.beginPath();
+            context.arc(64, 64, 50, 0, Math.PI * 2);
+            context.stroke();
+            
+            context.fillStyle = 'black';
+            context.font = 'Bold 48px Arial';
+            context.textAlign = 'center';
+            context.textBaseline = 'middle';
+            context.fillText(number, 64, 64);
+            
+            const texture = new THREE.Texture(canvas);
+            texture.needsUpdate = true;
+            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture }));
+            sprite.position.set(position[0], position[1], position[2]);
+            sprite.scale.set(0.6, 0.6, 1);
+            sprite.userData.componentNumber = number; // Store the component number
+            return sprite;
+        }
+
+        const marker1 = createNumberMarker('1', [-3, 2.2, 0]);
+        scene.add(marker1);
+        const marker2 = createNumberMarker('2', [3, 2.2, 0]);
+        scene.add(marker2);
+        const marker3 = createNumberMarker('3', [0, 2.2, 0]);
+        scene.add(marker3);
+        const marker4 = createNumberMarker('4', [0.6, 0, 0]);
+        scene.add(marker4);
+        const marker5 = createNumberMarker('5', [0, -2.5, 0]);
+        scene.add(marker5);
+        const marker6 = createNumberMarker('6', [-1.8, 1.5, 0]);
+        scene.add(marker6);
+        const marker7 = createNumberMarker('7', [0.6, 1.5, 0]);
+        scene.add(marker7);
+        const marker8 = createNumberMarker('8', [2.8, 1.4, 0]);
+        scene.add(marker8);
+        const marker9 = createNumberMarker('9', [2.8, 0.6, 0]);
+        scene.add(marker9);
+        const marker10 = createNumberMarker('10', [-1.8, 0.7, 0]);
+        scene.add(marker10);
+        const marker11 = createNumberMarker('11', [4.2, -0.8, 0]);
+        scene.add(marker11);
+
+        // Store all markers for raycasting
+        const markers = [marker1, marker2, marker3, marker4, marker5, marker6, marker7, marker8, marker9, marker10, marker11];
+
+        let isDragging = false;
+        let previousMousePosition = { x: 0, y: 0 };
+        let rotation = { x: 0.3, y: 0.5 };
+        let radius = 12;
+
+        // Raycaster for detecting clicks on markers
+        const raycaster = new THREE.Raycaster();
+        const mouse = new THREE.Vector2();
+
+        renderer.domElement.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            previousMousePosition = { x: e.clientX, y: e.clientY };
+        });
+
+        // Change cursor on hover
+        renderer.domElement.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                const deltaX = e.clientX - previousMousePosition.x;
+                const deltaY = e.clientY - previousMousePosition.y;
+                rotation.y += deltaX * 0.005;
+                rotation.x += deltaY * 0.005;
+                rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, rotation.x));
+                previousMousePosition = { x: e.clientX, y: e.clientY };
+            } else {
+                // Check if hovering over marker 6
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+                
+                raycaster.setFromCamera(mouse, camera);
+                const intersects = raycaster.intersectObjects(markers);
+                
+                if (intersects.length > 0 && intersects[0].object.userData.componentNumber === '6') {
+                    renderer.domElement.style.cursor = 'pointer';
+                } else {
+                    renderer.domElement.style.cursor = isDragging ? 'grabbing' : 'grab';
+                }
+            }
+        });
+
+        renderer.domElement.addEventListener('mouseup', (e) => {
+            // Check if this was a click (not a drag)
+            const dragDistance = Math.sqrt(
+                Math.pow(e.clientX - previousMousePosition.x, 2) + 
+                Math.pow(e.clientY - previousMousePosition.y, 2)
+            );
+            
+            if (dragDistance < 5) { // Consider it a click if moved less than 5 pixels
+                // Calculate mouse position in normalized device coordinates
+                const rect = renderer.domElement.getBoundingClientRect();
+                mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+                mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+                
+                // Update the raycaster
+                raycaster.setFromCamera(mouse, camera);
+                
+                // Check for intersections with markers
+                const intersects = raycaster.intersectObjects(markers);
+                
+                if (intersects.length > 0) {
+                    const clickedMarker = intersects[0].object;
+                    const componentNum = clickedMarker.userData.componentNumber;
+                    
+                    // Only show modal for marker 6
+                    if (componentNum === '6') {
+                        showComponentImage(6);
+                    }
+                }
+            }
+            
+            isDragging = false;
+        });
+        
+        renderer.domElement.addEventListener('mouseleave', () => isDragging = false);
+
+        renderer.domElement.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            radius = Math.max(5, Math.min(25, radius - e.deltaY * 0.002));
+        }, { passive: false });
+
+        function animate() {
+            requestAnimationFrame(animate);
+            camera.position.x = Math.cos(rotation.y) * Math.cos(rotation.x) * radius;
+            camera.position.y = Math.sin(rotation.x) * radius;
+            camera.position.z = Math.sin(rotation.y) * Math.cos(rotation.x) * radius;
+            camera.lookAt(0, 0, 0);
+            renderer.render(scene, camera);
+        }
+        animate();
+
+        window.addEventListener('resize', () => {
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        });
+
+        function toggleCategory(element) {
+            element.classList.toggle('open');
+            const content = element.nextElementSibling;
+            content.classList.toggle('show');
+        }
+
+        function toggleDamperType(element) {
+            element.classList.toggle('open');
+            const content = element.nextElementSibling;
+            content.classList.toggle('show');
+        }
+
+        function toggleSubitem(element) {
+            element.classList.toggle('open');
+            const content = element.nextElementSibling;
+            content.classList.toggle('show');
+        }
+
+        function toggleType(element) {
+            element.classList.toggle('open');
+            const content = element.nextElementSibling;
+            content.classList.toggle('show');
+            
+            // Add click handlers to images when content is expanded
+            setTimeout(() => {
+                const images = content.querySelectorAll('img');
+                images.forEach(img => {
+                    img.onclick = function() {
+                        openImageModal(this.src, this.alt);
+                    };
+                });
+            }, 100);
+        }
+
+        // Image modal functionality
+        const imageModal = document.getElementById('imageModal');
+        const closeModalBtn = document.getElementById('closeModal');
+
+        // Close modal when clicking the X button
+        closeModalBtn.onclick = function() {
+            imageModal.classList.remove('show');
+        };
+
+        // Close modal when clicking outside the image
+        imageModal.onclick = function(e) {
+            if (e.target === imageModal) {
+                imageModal.classList.remove('show');
+            }
+        };
+
+        // Close modal with Escape key
+        document.onkeydown = function(e) {
+            if (e.key === 'Escape' && imageModal.classList.contains('show')) {
+                imageModal.classList.remove('show');
+            }
+        };
+    </script>
+</body>
+</html>
